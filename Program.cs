@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using MinhaPrimeiraApi.Data;
 using MinhaPrimeiraApi.Models;
 using MinhaPrimeiraApi.Services;
 
@@ -5,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddSingleton<AlunoService>();
 
