@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniValidation;
 using MinhaPrimeiraApi.DTOs;
@@ -8,6 +9,7 @@ namespace MinhaPrimeiraApi.Controllers;
 
 [ApiController]
 [Route("alunos")]
+[Authorize]
 public class AlunosController : ControllerBase
 {
     private readonly AlunoService _service;
