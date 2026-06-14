@@ -1,3 +1,7 @@
 namespace MinhaPrimeiraApi.Models;
 
-public record Aluno(int Id, string Nome);
+public class Aluno
+{
+    public int Id { get; set; }
+    public string Nome { get; set; } = string.Empty;
+}

@@ -11,7 +11,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddSingleton<AlunoService>();
+builder.Services.AddScoped<AlunoService>();
 
 var app = builder.Build();
 
@@ -49,6 +49,29 @@ app.MapPost("/alunos", (Aluno aluno, AlunoService service) =>
     return Results.Created($"/alunos/{novoAluno.Id}", novoAluno);
 })
 .WithName("CriarAluno")
+.WithOpenApi();
+
+app.MapPut("/alunos/{id}", (int id, Aluno aluno, AlunoService service) =>
+{
+    var alunoAtualizado = service.Atualizar(id, aluno);
+
+    if (alunoAtualizado is null)
+        return Results.NotFound("Aluno não encontrado");
+
+    return Results.Ok(alunoAtualizado);
+})
+    .WithName("AtualizarAluno")
+    .WithOpenApi();
+   app.MapDelete("/alunos/{id}", (int id, AlunoService service) =>
+{
+    var deletado = service.Deletar(id);
+
+    if (!deletado)
+        return Results.NotFound("Aluno não encontrado");
+
+    return Results.NoContent();
+})
+.WithName("DeletarAluno")
 .WithOpenApi();
 
 app.Run();

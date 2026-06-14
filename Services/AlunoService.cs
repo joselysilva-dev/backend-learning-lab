@@ -1,29 +1,70 @@
+using MinhaPrimeiraApi.Data;
 using MinhaPrimeiraApi.Models;
 
 namespace MinhaPrimeiraApi.Services;
 
 public class AlunoService
 {
-    private readonly List<Aluno> alunos = new()
+    private readonly AppDbContext _context;
+
+    public AlunoService(AppDbContext context)
     {
-        new Aluno(1, "Josely"),
-        new Aluno(2, "Laura"),
-        new Aluno(3, "Luana")
-    };
+        _context = context;
+    }
 
     public List<Aluno> Listar()
     {
-        return alunos;
+        return _context.Alunos.ToList();
     }
 
     public Aluno? BuscarPorId(int id)
-{
-    return alunos.FirstOrDefault(aluno => aluno.Id == id);
-}
+    {
+        return _context.Alunos.FirstOrDefault(a => a.Id == id);
+    }
 
     public Aluno Criar(Aluno aluno)
     {
-        alunos.Add(aluno);
+        _context.Alunos.Add(aluno);
+        _context.SaveChanges();
+
         return aluno;
     }
+
+    public Aluno? Atualizar(int id, Aluno alunoAtualizado)
+    {
+        var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+
+        if (aluno is null)
+            return null;
+
+        aluno.Nome = alunoAtualizado.Nome;
+
+        _context.SaveChanges();
+
+        return aluno;
+    }
+    public bool Deletar(int id)
+{
+    var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+
+    if (aluno is null)
+        return false;
+
+    _context.Alunos.Remove(aluno);
+    _context.SaveChanges();
+
+    return true;
+}
+public bool deletar(int id)
+{
+    var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+
+    if (aluno is null)
+        return false;
+
+    _context.Alunos.Remove(aluno);
+    _context.SaveChanges();
+
+    return true;
+}
 }
