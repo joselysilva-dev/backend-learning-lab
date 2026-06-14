@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using MinhaPrimeiraApi.Data;
+using MinhaPrimeiraApi.DTOs;
 using MinhaPrimeiraApi.Models;
 using MinhaPrimeiraApi.Services;
-
+using MiniValidation;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -42,8 +43,16 @@ app.MapGet("/alunos/{id}", (int id, AlunoService service) =>
 .WithName("GetAlunoPorId")
 .WithOpenApi();
 
-app.MapPost("/alunos", (Aluno aluno, AlunoService service) =>
+app.MapPost("/alunos", (AlunoCreateDto dto, AlunoService service) =>
 {
+    if (!MiniValidator.TryValidate(dto, out var errors))
+        return Results.ValidationProblem(errors);
+
+    var aluno = new Aluno
+    {
+        Nome = dto.Nome
+    };
+
     var novoAluno = service.Criar(aluno);
 
     return Results.Created($"/alunos/{novoAluno.Id}", novoAluno);
@@ -51,8 +60,16 @@ app.MapPost("/alunos", (Aluno aluno, AlunoService service) =>
 .WithName("CriarAluno")
 .WithOpenApi();
 
-app.MapPut("/alunos/{id}", (int id, Aluno aluno, AlunoService service) =>
+app.MapPut("/alunos/{id}", (int id, AlunoUpdateDto dto, AlunoService service) =>
 {
+    if (!MiniValidator.TryValidate(dto, out var errors))
+        return Results.ValidationProblem(errors);
+
+    var aluno = new Aluno
+    {
+        Nome = dto.Nome
+    };
+
     var alunoAtualizado = service.Atualizar(id, aluno);
 
     if (alunoAtualizado is null)
@@ -60,9 +77,10 @@ app.MapPut("/alunos/{id}", (int id, Aluno aluno, AlunoService service) =>
 
     return Results.Ok(alunoAtualizado);
 })
-    .WithName("AtualizarAluno")
-    .WithOpenApi();
-   app.MapDelete("/alunos/{id}", (int id, AlunoService service) =>
+.WithName("AtualizarAluno")
+.WithOpenApi();
+
+app.MapDelete("/alunos/{id}", (int id, AlunoService service) =>
 {
     var deletado = service.Deletar(id);
 
