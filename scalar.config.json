@@ -1,0 +1,6 @@
+{
+  "title": "MinhaPrimeiraApi",
+  "description": "Documentação da API REST criada com ASP.NET Core, Entity Framework Core e SQLite.",
+  "theme": "default",
+  "url": "http://localhost:5171/swagger/v1/swagger.json"
+}
