@@ -1,16 +1,20 @@
-using MinhaPrimeiraApi.Middlewares;
-using MinhaPrimeiraApi.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MinhaPrimeiraApi.Data;
+using MinhaPrimeiraApi.Middlewares;
+using MinhaPrimeiraApi.Repositories;
 using MinhaPrimeiraApi.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var key = Encoding.UTF8.GetBytes("minha-chave-super-secreta-para-estudos-jwt");
+var jwtKey = builder.Configuration["Jwt:Key"]!;
+var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
+var jwtAudience = builder.Configuration["Jwt:Audience"]!;
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddControllers();
 
@@ -23,10 +27,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
-            ValidIssuer = "MinhaPrimeiraApi",
-            ValidAudience = "MinhaPrimeiraApi",
-
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
@@ -66,12 +68,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IAlunoRepository, AlunoRepository>();
+builder.Services.AddScoped<AlunoService>();
+builder.Services.AddScoped<TokenService>();
 
 var app = builder.Build();
+
 app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
